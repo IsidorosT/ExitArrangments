@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#2f4a2f">
+<title>Εξοδούχοι</title>
+<style>
+:root{--bg:#f4f5f0;--card:#fff;--fg:#1d211b;--mut:#6b7266;--line:#dde0d6;--acc:#3d5f3a;--dn:#2f6b2a;--e:#b07800;--o:#9aa094;--ask:#fff4cc;--askb:#e0b100}
+@media (prefers-color-scheme:dark){:root{--bg:#141712;--card:#1e221c;--fg:#e8ebe4;--mut:#99a093;--line:#30362d;--acc:#7fae78;--dn:#5d9457;--e:#d9a520;--o:#5c6358;--ask:#3a3216;--askb:#c99d10}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;font:16px/1.35 system-ui,Roboto,sans-serif;background:var(--bg);color:var(--fg);padding-bottom:72px}
+header{position:sticky;top:0;z-index:5;background:var(--bg);padding:10px 10px 6px;border-bottom:1px solid var(--line)}
+h1{font-size:17px;margin:0 0 8px}
+.dnav{display:flex;align-items:center;gap:6px}
+.dnav .lbl{flex:1;text-align:center;font-weight:700;font-size:17px}
+.dnav .lbl small{display:block;font-weight:400;font-size:12px;color:var(--mut)}
+.bar{display:flex;gap:8px;align-items:center;margin-top:6px;font-size:13px;color:var(--mut);flex-wrap:wrap}
+.pill{padding:3px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line)}
+.pill.warn{background:var(--ask);border-color:var(--askb);color:var(--fg)}
+.pill.lock{font-weight:700;color:var(--fg)}
+main{padding:8px 10px}
+.row{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 7px 7px 12px;margin-bottom:6px}
+.row.ask{background:var(--ask);border-color:var(--askb)}
+.name{flex:1;min-width:0;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.name small{display:block;font-weight:400;color:var(--mut);font-size:12px}
+.val{width:40px;text-align:center;font-weight:800}
+.c-ΔΝ{color:var(--dn)}.c-Ε{color:var(--e)}.c-Ο{color:var(--o)}
+.seg{display:flex;gap:4px}
+.seg button,.ok{width:44px;height:42px;border-radius:10px;border:1px solid var(--line);background:transparent;color:var(--fg);font-weight:700;font-size:15px}
+.seg button.on.b-ΔΝ{background:var(--dn);border-color:var(--dn);color:#fff}
+.seg button.on.b-Ε{background:var(--e);border-color:var(--e);color:#fff}
+.seg button.on.b-Ο{background:var(--o);border-color:var(--o);color:#fff}
+.ok{border:2px solid var(--askb);font-size:18px}
+.okph{width:44px}
+.frow{display:flex;justify-content:space-between;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin-bottom:5px}
+.frow b{font-weight:800}
+.big{text-align:center;font-size:20px;font-weight:800;padding:30px 0}
+.btn{border:0;border-radius:12px;padding:12px 14px;font-size:15px;font-weight:600;background:var(--acc);color:#fff}
+.btn.sec{background:var(--card);color:var(--fg);border:1px solid var(--line)}
+.btn.sm{padding:8px 10px;font-size:14px}
+.btns{display:flex;gap:8px;margin:8px 0}
+.btns .btn{flex:1}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;background:var(--card);border-top:1px solid var(--line);z-index:6}
+nav button{flex:1;border:0;background:none;color:var(--mut);padding:9px 0 11px;font-size:13px;font-weight:600}
+nav button.on{color:var(--acc)}
+nav button span{display:block;font-size:20px}
+textarea,input,select{width:100%;font:inherit;color:var(--fg);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px}
+textarea{min-height:220px;font-family:ui-monospace,monospace;font-size:14px}
+.prow{display:flex;gap:6px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:6px;margin-bottom:6px}
+.prow input{flex:1;padding:8px;min-width:0}
+.prow select{width:auto;padding:8px 4px;font-size:13px}
+.ic{width:36px;height:38px;border-radius:8px;border:1px solid var(--line);background:transparent;color:var(--fg);font-size:15px;flex:0 0 auto}
+h2{font-size:15px;margin:16px 2px 8px;color:var(--mut)}
+.hint{font-size:13px;color:var(--mut);margin:4px 2px 10px}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;padding:8px 10px;font-size:14px}
+.chip.sel{background:var(--acc);color:#fff;border-color:var(--acc)}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%);background:#222;color:#fff;padding:10px 16px;border-radius:99px;font-size:14px;opacity:0;transition:opacity .2s;pointer-events:none;z-index:30}
+.toast.show{opacity:.95}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal>div{background:var(--card);border-radius:14px;padding:16px;max-width:420px;width:100%;max-height:90vh;overflow:auto}
+.modal h3{margin:0 0 10px;font-size:17px}
+.modal p{margin:0 0 12px;white-space:pre-line}
+.vbtns{display:flex;flex-direction:column;gap:8px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<header>
+  <h1 id="hTitle"></h1>
+  <div class="dnav">
+    <button class="btn sec sm" id="prev">◀</button>
+    <div class="lbl" id="dLbl"></div>
+    <button class="btn sec sm" id="next">▶</button>
+    <button class="btn sec sm" id="today">Σήμ.</button>
+  </div>
+  <div class="bar" id="bar"></div>
+</header>
+<main>
+  <section id="tab-day"></section>
+  <section id="tab-msg" class="hidden"></section>
+  <section id="tab-set" class="hidden"></section>
+</main>
+<nav>
+  <button data-t="day" class="on"><span>📋</span>Ημέρα</button>
+  <button data-t="msg"><span>✉️</span>Μήνυμα</button>
+  <button data-t="set"><span>⚙️</span>Λίστα</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+// Ίδια λογική με την έκδοση Scriptable (scriptable/Exodouxoi.js).
+const KEY = 'exodouxoi.v2';
+const CODES = ['ΔΝ', 'Ε', 'Ο'];
+const LABEL = { 'ΔΝ': 'ΔΝ', 'Ε': 'Ε', 'Ο': '—' };
+const WD = ['Κυριακή','Δευτέρα','Τρίτη','Τετάρτη','Πέμπτη','Παρασκευή','Σάββατο'];
+const MODES = { auto: 'Πρόταση: αυτόματη', 'ΔΝ': 'Πρόταση: ΔΝ', 'Ε': 'Πρόταση: Ε', 'Ο': 'Πρόταση: —' };
+
+// ---------- Δεδομένα ----------
+let S;
+const uid = () => Math.random().toString(36).slice(2, 9);
+function load() {
+  try { S = JSON.parse(localStorage.getItem(KEY)); } catch (e) { S = null; }
+  if (!S || !S.people) S = { title: 'Εξοδούχοι', people: [], days: {}, seed: [] };
+  if (!S.seed) S.seed = [];
+}
+function save() {
+  const cut = addDays(TODAY, -120);
+  Object.keys(S.days).forEach(k => { if (k < cut) delete S.days[k]; });
+  try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { toast('Δεν αποθηκεύτηκε!'); }
+}
+
+// ---------- Ημερομηνίες ----------
+const pad = n => String(n).padStart(2, '0');
+const ds = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+const pd = s => { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); };
+const addDays = (s, n) => { const d = pd(s); d.setDate(d.getDate() + n); return ds(d); };
+let TODAY = ds(new Date());
+const dayName = s => WD[pd(s).getDay()];
+const dayShort = s => { const d = pd(s); return `${dayName(s)} ${d.getDate()}/${d.getMonth() + 1}`; };
+function day(s) { return S.days[s] || (S.days[s] = { codes: {}, conf: {} }); }
+
+function isClosed(s) {
+  const d = S.days[s];
+  if (d && d.open) return false;
+  if (d && d.closed) return true;
+  return s < TODAY;
+}
+function closeDay(s) {
+  const d = day(s);
+  S.people.forEach(p => { if (!d.codes[p.id]) d.codes[p.id] = eff(p, s).code; d.conf[p.id] = true; });
+  d.closed = true; d.open = false;
+}
+
+// ---------- Πρόταση από τις συνήθειες (μόνο προσυμπλήρωση) ----------
+function predict(p, dateStr) {
+  if (MODES[p.mode] && p.mode !== 'auto') return { code: p.mode };
+  const wd = pd(dateStr).getDay();
+  const past = Object.keys(S.days)
+    .filter(k => k < dateStr && !S.days[k].noExit && S.days[k].codes[p.id])
+    .sort().reverse().slice(0, 12)
+    .map(k => ({ wd: pd(k).getDay(), code: S.days[k].codes[p.id] }));
+  const seed = past.length < 6 ? S.seed.map(x => ({ wd: x.wd, code: x.codes[p.id] })).filter(x => x.code) : [];
+  const src = past.concat(seed);
+  if (!src.length) return { code: 'ΔΝ' };
+  const sc = {};
+  src.forEach(x => { sc[x.code] = (sc[x.code] || 0) + (x.wd === wd ? 3 : 1); });
+  return { code: Object.keys(sc).sort((a, b) => sc[b] - sc[a])[0] };
+}
+function eff(p, s) {
+  const d = S.days[s];
+  if (isClosed(s)) return { code: (d && d.codes[p.id]) || 'Ο', ask: false };
+  if (d && d.codes[p.id] && d.conf[p.id]) return { code: d.codes[p.id], ask: false };
+  return { code: predict(p, s).code, ask: true };
+}
+const pendingCount = days => days.reduce((n, s) => n + S.people.filter(p => eff(p, s).ask).length, 0);
+
+// ---------- Μήνυμα ----------
+function buildMsg(days) {
+  let out = S.title + '\n';
+  days.forEach(s => {
+    out += '\n' + dayName(s) + '\n\n';
+    if (S.days[s] && S.days[s].noExit) { out += 'Καμία έξοδος\n'; return; }
+    S.people.forEach(p => { const e = eff(p, s); if (e.code !== 'Ο') out += `${p.name} ${e.code}\n`; });
+  });
+  return out.trim();
+}
+
+// ---------- Κοινοποίηση / αντιγραφή (εφαρμογή Android ή browser) ----------
+const NATIVE = window.AndroidBridge;
+async function shareText(t) {
+  if (NATIVE) { NATIVE.share(t); return true; }
+  if (navigator.share) { try { await navigator.share({ text: t }); return true; } catch (e) { return false; } }
+  return copyText(t);
+}
+async function copyText(t) {
+  if (NATIVE) { NATIVE.copy(t); toast('Αντιγράφηκε ✓'); return true; }
+  try { await navigator.clipboard.writeText(t); toast('Αντιγράφηκε ✓'); return true; }
+  catch (e) { toast('Δεν επιτράπηκε η αντιγραφή'); return false; }
+}
+
+// ---------- UI βοηθητικά ----------
+function toast(t) { const el = document.getElementById('toast'); el.textContent = t; el.classList.add('show'); clearTimeout(toast.t); toast.t = setTimeout(() => el.classList.remove('show'), 1700); }
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function modal(inner) {
+  const m = document.createElement('div'); m.className = 'modal';
+  m.innerHTML = `<div>${inner}</div>`; document.body.appendChild(m); return m;
+}
+function ask(msg, ok) {
+  return new Promise(res => {
+    const m = modal(`<p>${esc(msg)}</p><div class="btns"><button class="btn sec" data-n>Άκυρο</button><button class="btn" data-y>${esc(ok || 'ΟΚ')}</button></div>`);
+    m.querySelector('[data-n]').onclick = () => { m.remove(); res(false); };
+    m.querySelector('[data-y]').onclick = () => { m.remove(); res(true); };
+  });
+}
+function choose(title, options, msg) {
+  return new Promise(res => {
+    const m = modal(`<h3>${esc(title)}</h3>${msg ? `<p>${esc(msg)}</p>` : ''}<div class="vbtns">${options.map((o, i) => `<button class="btn ${i ? 'sec' : ''}" data-i="${i}">${esc(o)}</button>`).join('')}<button class="btn sec" data-i="-1">Άκυρο</button></div>`);
+    m.querySelectorAll('[data-i]').forEach(b => b.onclick = () => { m.remove(); res(+b.dataset.i); });
+  });
+}
+
+// ---------- Εισαγωγή από κείμενο μηνύματος ----------
+const norm = x => x.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase().replace(/ς/g, 'σ').replace(/\s+/g, ' ').trim();
+const CODE_IN = { 'δν': 'ΔΝ', 'dn': 'ΔΝ', 'ε': 'Ε', 'e': 'Ε', 'ο': 'Ο', 'o': 'Ο' };
+function parseText(text) {
+  const wdIdx = {}; WD.forEach((w, i) => (wdIdx[norm(w)] = i));
+  const sections = []; let cs = null;
+  text.split(/\r?\n/).forEach(raw => {
+    const line = raw.trim(); if (!line) return;
+    const n = norm(line);
+    if (n in wdIdx) { cs = { wd: wdIdx[n], rows: [] }; sections.push(cs); return; }
+    if (!cs) return;
+    if (n === 'καμια εξοδοσ') { cs.noExit = true; return; }
+    const parts = line.split(/\s+/);
+    let code = 'Ο', name = line;
+    if (parts.length > 1 && CODE_IN[norm(parts[parts.length - 1])]) { code = CODE_IN[norm(parts[parts.length - 1])]; name = parts.slice(0, -1).join(' '); }
+    cs.rows.push({ name, code });
+  });
+  return sections;
+}
+// Μαζική προσθήκη: ένα όνομα ανά γραμμή (ή με κόμματα). Δέχεται και ολόκληρο μήνυμα.
+function parseNames(text) {
+  const wd = new Set(WD.map(norm));
+  let lines = text.split(/\r?\n/).flatMap(l => l.split(',')).map(l => l.trim());
+  const firstDay = lines.findIndex(l => wd.has(norm(l)));
+  if (firstDay >= 0) lines = lines.slice(firstDay); // αγνόησε τον τίτλο του μηνύματος
+  const out = [], seen = new Set(S.people.map(p => norm(p.name)));
+  lines.forEach(l => {
+    if (!l || wd.has(norm(l)) || norm(l) === 'καμια εξοδοσ') return;
+    const parts = l.split(/\s+/);
+    if (parts.length > 1 && CODE_IN[norm(parts[parts.length - 1])]) parts.pop();
+    const name = parts.join(' ');
+    if (!name || seen.has(norm(name))) return;
+    seen.add(norm(name)); out.push(name);
+  });
+  return out;
+}
+function bulkNames() {
+  const m = modal(`<h3>Μαζική προσθήκη ονομάτων</h3><p class="hint">Ένα όνομα ανά γραμμή, με τη σειρά του μηνύματος. Μπορείς να επικολλήσεις και ολόκληρο παλιό μήνυμα. Όσα υπάρχουν ήδη παραλείπονται.</p>
+    <textarea id="bulkTxt" placeholder="Πάτα παρατεταμένα → Επικόλληση"></textarea>
+    <div class="btns"><button class="btn sec" data-n>Άκυρο</button><button class="btn" data-y>Συνέχεια</button></div>`);
+  m.querySelector('[data-n]').onclick = () => m.remove();
+  m.querySelector('[data-y]').onclick = async () => {
+    const names = parseNames(m.querySelector('#bulkTxt').value);
+    if (!names.length) { toast('Δεν βρέθηκαν νέα ονόματα'); return; }
+    m.remove();
+    if (!(await ask(`Θα προστεθούν ${names.length}:\n${names.join('\n')}`, 'Προσθήκη'))) return;
+    names.forEach(n => S.people.push({ id: uid(), name: n, mode: 'auto' }));
+    save(); render(); toast(`Προστέθηκαν ${names.length} ✓`);
+  };
+}
+
+function importText() {
+  const m = modal(`<h3>Εισαγωγή από μήνυμα</h3><p class="hint">Επικόλλησε ένα μήνυμα (τίτλος, ονόματα ημερών, ονόματα με ΔΝ/Ε/Ο).</p>
+    <textarea id="impMsg" placeholder="Πάτα παρατεταμένα → Επικόλληση"></textarea>
+    <div class="btns"><button class="btn sec" data-n>Άκυρο</button><button class="btn" data-y>Συνέχεια</button></div>`);
+  m.querySelector('[data-n]').onclick = () => m.remove();
+  m.querySelector('[data-y]').onclick = async () => {
+    const sections = parseText(m.querySelector('#impMsg').value);
+    if (!sections.length) { toast('Δεν βρέθηκαν ημέρες στο κείμενο'); return; }
+    m.remove();
+    const first = sections[0].wd;
+    const cands = [];
+    for (let i = 7; i >= -20; i--) { const d = addDays(TODAY, i); if (pd(d).getDay() === first) cands.push(d); }
+    const shown = cands.slice(0, 4);
+    const i = await choose(`Η πρώτη μέρα (${WD[first]}) είναι:`, shown.map(d => dayShort(d) + (d === TODAY ? ' (σήμερα)' : d === addDays(TODAY, 1) ? ' (αύριο)' : '')));
+    if (i === -1) return;
+    sections[0].date = shown[i];
+    for (let k = 1; k < sections.length; k++) {
+      let d = addDays(sections[k - 1].date, 1);
+      while (pd(d).getDay() !== sections[k].wd) d = addDays(d, 1);
+      sections[k].date = d;
+    }
+    const byName = {}; S.people.forEach(p => (byName[norm(p.name)] = p));
+    const unknown = [];
+    sections.forEach(sec => sec.rows.forEach(r => { if (!byName[norm(r.name)] && !unknown.some(u => norm(u) === norm(r.name))) unknown.push(r.name); }));
+    if (unknown.length) {
+      const r = await choose(`${unknown.length} νέα ονόματα`, ['Πρόσθεσέ τους στη λίστα', 'Αγνόησέ τους'], unknown.join('\n'));
+      if (r === -1) return;
+      if (r === 0) unknown.forEach(n => { const p = { id: uid(), name: n, mode: 'auto' }; S.people.push(p); byName[norm(n)] = p; });
+    }
+    const summary = sections.map(sec => {
+      const ex = S.days[sec.date] && Object.keys(S.days[sec.date].codes).length ? ' (αντικατάσταση)' : '';
+      if (sec.noExit) return `${dayShort(sec.date)}: Καμία έξοδος${ex}`;
+      const c = { 'ΔΝ': 0, 'Ε': 0 }; sec.rows.forEach(r => { if (c[r.code] !== undefined) c[r.code]++; });
+      return `${dayShort(sec.date)}: ΔΝ ${c['ΔΝ']}, Ε ${c['Ε']}${ex}`;
+    }).join('\n');
+    if (!(await ask(summary + '\n\nΌσοι δεν αναφέρονται ή δεν έχουν κωδικό μετράνε ως «—».', 'Εισαγωγή'))) { save(); render(); return; }
+    sections.forEach(sec => {
+      const d = (S.days[sec.date] = { codes: {}, conf: {}, closed: true });
+      if (sec.noExit) d.noExit = true;
+      S.people.forEach(p => { d.codes[p.id] = 'Ο'; d.conf[p.id] = true; });
+      sec.rows.forEach(r => { const p = byName[norm(r.name)]; if (p) d.codes[p.id] = r.code; });
+    });
+    save();
+    cur = sections[sections.length - 1].date; tab = 'day';
+    render(); toast('Έγινε εισαγωγή ✓');
+  };
+}
+
+// ---------- Οθόνες ----------
+let cur = TODAY, tab = 'day', onlyAsk = false, msgN = 1;
+
+function renderHeader() {
+  document.getElementById('hTitle').textContent = S.title;
+  const sub = cur === TODAY ? 'σήμερα' : cur === addDays(TODAY, 1) ? 'αύριο' : cur === addDays(TODAY, -1) ? 'χθες' : '';
+  document.getElementById('dLbl').innerHTML = `${esc(dayShort(cur))}${sub ? `<small>${sub}</small>` : ''}`;
+  const bar = document.getElementById('bar');
+  const d = S.days[cur];
+  if (isClosed(cur)) {
+    const has = d && Object.keys(d.codes).length;
+    if (d && d.noExit) bar.innerHTML = `<span class="pill lock">🚫 Καμία έξοδος</span><span class="pill lock">🔒 τελική</span>`;
+    else if (!has) bar.innerHTML = `<span class="pill">Δεν υπάρχουν δεδομένα</span>`;
+    else {
+      const c = { 'ΔΝ': 0, 'Ε': 0, 'Ο': 0 }; S.people.forEach(p => c[eff(p, cur).code]++);
+      bar.innerHTML = `<span class="pill">ΔΝ ${c['ΔΝ']}</span><span class="pill">Ε ${c['Ε']}</span><span class="pill">— ${c['Ο']}</span><span class="pill lock">🔒 τελική</span>`;
+    }
+    return;
+  }
+  const c = { 'ΔΝ': 0, 'Ε': 0, 'Ο': 0 }; let a = 0;
+  S.people.forEach(p => { const e = eff(p, cur); c[e.code]++; if (e.ask) a++; });
+  bar.innerHTML = `<span class="pill">ΔΝ ${c['ΔΝ']}</span><span class="pill">Ε ${c['Ε']}</span><span class="pill">— ${c['Ο']}</span>
+    ${a ? `<span class="pill warn">Έμειναν: ${a}</span>` : '<span class="pill">✓ όλοι</span>'}`;
+}
+
+function renderDay() {
+  const el = document.getElementById('tab-day');
+  if (!S.people.length) {
+    el.innerHTML = `<p class="big" style="font-weight:400">Δεν υπάρχουν ακόμα άτομα.</p>
+      <div class="vbtns"><button class="btn" id="bulk0">📋 Μαζική προσθήκη ονομάτων</button><button class="btn sec" id="imp0">📥 Εισαγωγή από παλιό μήνυμα</button><button class="btn sec" id="set0">⚙️ Λίστα</button></div>`;
+    el.querySelector('#bulk0').onclick = bulkNames;
+    el.querySelector('#imp0').onclick = importText;
+    el.querySelector('#set0').onclick = () => { tab = 'set'; render(); };
+    return;
+  }
+  if (isClosed(cur)) return renderClosed(el);
+  let h = `<div class="btns"><button class="btn sec sm" id="fAsk">${onlyAsk ? 'Όλοι' : 'Μόνο εκκρεμή'}</button><button class="btn sec sm" id="toMsg">✉️ Μήνυμα</button></div>`;
+  let shown = 0;
+  S.people.forEach(p => {
+    const e = eff(p, cur); if (onlyAsk && !e.ask) return; shown++;
+    h += `<div class="row ${e.ask ? 'ask' : ''}" data-id="${p.id}">
+      <div class="name">${esc(p.name)}${e.ask ? '<small>πρόταση</small>' : ''}</div>
+      <div class="val c-${e.code}">${LABEL[e.code]}${e.ask ? '?' : ''}</div>
+      ${e.ask ? '<button class="ok" data-ok>✓</button>' : '<span class="okph"></span>'}
+      <div class="seg">${CODES.map(c => `<button class="b-${c} ${!e.ask && e.code === c ? 'on' : ''}" data-c="${c}">${LABEL[c]}</button>`).join('')}</div></div>`;
+  });
+  if (onlyAsk && !shown) h += '<p class="big">Όλοι επιβεβαιωμένοι 👍</p>';
+  h += `<div class="btns" style="margin-top:14px"><button class="btn sec" id="noExit">🚫 Καμία έξοδος</button><button class="btn" id="close">🔒 Κλείσε (τελική)</button></div>
+    <div class="btns"><button class="btn sec sm" id="imp">📥 Εισαγωγή κειμένου</button><button class="btn sec sm" id="reset">↺ Μηδένισε μέρα</button></div>`;
+  el.innerHTML = h;
+  el.querySelectorAll('.row').forEach(r => {
+    const id = r.dataset.id, p = S.people.find(x => x.id === id);
+    const set = c => { const d = day(cur); d.codes[id] = c; d.conf[id] = true; save(); render(); };
+    r.querySelectorAll('[data-c]').forEach(b => b.onclick = () => set(b.dataset.c));
+    const ok = r.querySelector('[data-ok]'); if (ok) ok.onclick = () => set(eff(p, cur).code);
+  });
+  el.querySelector('#fAsk').onclick = () => { onlyAsk = !onlyAsk; render(); };
+  el.querySelector('#toMsg').onclick = () => { tab = 'msg'; render(); };
+  el.querySelector('#noExit').onclick = async () => {
+    if (!(await ask(`${dayShort(cur)}: κανείς δεν βγαίνει;`, 'Καμία έξοδος'))) return;
+    const d = (S.days[cur] = { codes: {}, conf: {}, noExit: true, closed: true });
+    S.people.forEach(p => { d.codes[p.id] = 'Ο'; d.conf[p.id] = true; });
+    save(); render();
+  };
+  el.querySelector('#close').onclick = async () => {
+    const a = pendingCount([cur]);
+    if (a && !(await ask(`${a} δεν έχουν επιβεβαιωθεί. Κλείσιμο με τις προτάσεις;`, 'Κλείσιμο'))) return;
+    closeDay(cur); save(); render();
+  };
+  el.querySelector('#imp').onclick = importText;
+  el.querySelector('#reset').onclick = async () => { if (await ask(`Μηδενισμός: ${dayShort(cur)};`, 'Μηδενισμός')) { delete S.days[cur]; save(); render(); } };
+}
+
+function renderClosed(el) {
+  const d = S.days[cur];
+  const has = d && Object.keys(d.codes).length;
+  let h = `<div class="btns"><button class="btn sec sm" id="toMsg">✉️ Μήνυμα</button><button class="btn sec sm" id="edit">✎ Αλλαγή</button></div>`;
+  if (d && d.noExit) h += '<p class="big">🚫 Καμία έξοδος</p>';
+  else if (has) S.people.forEach(p => { const e = eff(p, cur); if (e.code !== 'Ο') h += `<div class="frow"><span>${esc(p.name)}</span><b class="c-${e.code}">${e.code}</b></div>`; });
+  else h += '<p class="big" style="font-weight:400;color:var(--mut)">Δεν υπάρχουν δεδομένα</p>';
+  h += `<div class="btns" style="margin-top:14px"><button class="btn sec sm" id="imp">📥 Εισαγωγή κειμένου</button></div>`;
+  el.innerHTML = h;
+  el.querySelector('#toMsg').onclick = () => { tab = 'msg'; render(); };
+  el.querySelector('#imp').onclick = importText;
+  el.querySelector('#edit').onclick = async () => {
+    if (!(await ask(`Άνοιγμα της ${dayShort(cur)} για αλλαγές;`, 'Άνοιγμα'))) return;
+    if (d && d.noExit) S.days[cur] = { codes: {}, conf: {}, open: true };
+    else { const x = day(cur); x.open = true; x.closed = false; }
+    save(); render();
+  };
+}
+
+function renderMsg() {
+  const el = document.getElementById('tab-msg');
+  const days = Array.from({ length: msgN }, (_, i) => addDays(cur, i));
+  const pend = pendingCount(days);
+  let h = `<h2>Ημέρες στο μήνυμα (από ${esc(dayShort(cur))})</h2><div class="chips">`;
+  [1, 2, 3, 4].forEach(n => { h += `<button class="chip ${n === msgN ? 'sel' : ''}" data-n="${n}">${Array.from({ length: n }, (_, i) => dayName(addDays(cur, i)).slice(0, 3)).join(' + ')}</button>`; });
+  h += `</div>${pend ? `<p class="pill warn" style="display:inline-block;margin:10px 0 0">⚠️ ${pend} δεν έχουν επιβεβαιωθεί</p>` : ''}
+    <h2>Προεπισκόπηση</h2><textarea id="out">${esc(buildMsg(days))}</textarea>
+    <div class="btns"><button class="btn" id="share">Αποστολή</button><button class="btn sec" id="copy">Αντιγραφή</button></div>
+    <p class="hint">Μετά την αποστολή/αντιγραφή οι μέρες κλειδώνουν ως τελικές. Όσοι έχουν «—» δεν μπαίνουν.</p>`;
+  el.innerHTML = h;
+  el.querySelectorAll('[data-n]').forEach(b => b.onclick = () => { msgN = +b.dataset.n; renderMsg(); });
+  const commit = () => { days.forEach(s => { if (!isClosed(s)) closeDay(s); }); save(); renderHeader(); };
+  const text = () => el.querySelector('#out').value;
+  el.querySelector('#share').onclick = async () => {
+    if (pend && !(await ask(`${pend} δεν έχουν επιβεβαιωθεί. Αποστολή έτσι;`, 'Αποστολή'))) return;
+    const t = text(); commit(); await shareText(t);
+  };
+  el.querySelector('#copy').onclick = async () => { const t = text(); if (await copyText(t)) commit(); };
+}
+
+function renderSet() {
+  const el = document.getElementById('tab-set');
+  let h = `<h2>Τίτλος</h2><input id="title" value="${esc(S.title)}">
+    <h2>Άτομα (με τη σειρά του μηνύματος)</h2>
+    <p class="hint">Η πρόταση απλώς προσυμπληρώνει. Κάθε μέρα επιβεβαιώνεις τον καθένα με ✓ ή αλλάζεις. «Αυτόματη»: μαθαίνει από τις προηγούμενες μέρες.</p>`;
+  S.people.forEach((p, i) => {
+    h += `<div class="prow" data-i="${i}"><input value="${esc(p.name)}" data-f="name">
+      <select data-f="mode">${Object.entries(MODES).map(([k, v]) => `<option value="${k}" ${(MODES[p.mode] ? p.mode : 'auto') === k ? 'selected' : ''}>${v.replace('Πρόταση: ', '')}</option>`).join('')}</select>
+      <button class="ic" data-a="up">↑</button><button class="ic" data-a="del">✕</button></div>`;
+  });
+  if (!S.people.length) h += '<p class="hint">Η λίστα είναι άδεια.</p>';
+  h += `<div class="btns"><input id="newName" placeholder="Νέο όνομα"><button class="btn" id="add" style="flex:0 0 60px">+</button></div>
+    <button class="btn sec" id="bulkBtn" style="width:100%">📋 Μαζική προσθήκη ονομάτων</button>
+    <h2>Εισαγωγή από μήνυμα</h2>
+    <button class="btn sec" id="impMsgBtn" style="width:100%">📥 Εισαγωγή κειμένου</button>
+    <h2>Αντίγραφο ασφαλείας</h2>
+    <p class="hint">Τα δεδομένα μένουν μόνο σε αυτό το κινητό. Κράτα πού και πού αντίγραφο (π.χ. στείλ' το στον εαυτό σου).</p>
+    <div class="btns"><button class="btn sec" id="exp">Εξαγωγή</button><button class="btn sec" id="imp">Επαναφορά</button></div>
+    <textarea id="impTxt" class="hidden" style="min-height:120px" placeholder="Επικόλλησε εδώ το αντίγραφο και πάτα ξανά Επαναφορά"></textarea>`;
+  el.innerHTML = h;
+  el.querySelector('#title').onchange = e => { S.title = e.target.value.trim() || S.title; save(); renderHeader(); };
+  el.querySelectorAll('.prow').forEach(r => {
+    const i = +r.dataset.i, p = S.people[i];
+    r.querySelector('[data-f=name]').onchange = e => { p.name = e.target.value.trim() || p.name; save(); };
+    r.querySelector('[data-f=mode]').onchange = e => { p.mode = e.target.value; save(); };
+    r.querySelector('[data-a=up]').onclick = () => { if (i > 0) { [S.people[i - 1], S.people[i]] = [S.people[i], S.people[i - 1]]; save(); renderSet(); } };
+    r.querySelector('[data-a=del]').onclick = async () => { if (await ask(`Διαγραφή ${p.name};`, 'Διαγραφή')) { S.people.splice(i, 1); save(); renderSet(); renderHeader(); } };
+  });
+  el.querySelector('#add').onclick = () => { const n = el.querySelector('#newName').value.trim(); if (!n) return; S.people.push({ id: uid(), name: n, mode: 'auto' }); save(); renderSet(); };
+  el.querySelector('#impMsgBtn').onclick = importText;
+  el.querySelector('#bulkBtn').onclick = bulkNames;
+  el.querySelector('#exp').onclick = () => shareText(JSON.stringify(S));
+  el.querySelector('#imp').onclick = () => {
+    const ta = el.querySelector('#impTxt');
+    if (ta.classList.contains('hidden')) { ta.classList.remove('hidden'); ta.focus(); return; }
+    try { const o = JSON.parse(ta.value); if (!o.people) throw 0; S = o; save(); render(); toast('Έγινε επαναφορά ✓'); }
+    catch (e) { toast('Μη έγκυρο αντίγραφο'); }
+  };
+}
+
+function render() {
+  const t = ds(new Date()); if (t !== TODAY) { if (cur === TODAY) cur = t; TODAY = t; }
+  renderHeader();
+  ['day', 'msg', 'set'].forEach(t => document.getElementById('tab-' + t).classList.toggle('hidden', t !== tab));
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.t === tab));
+  if (tab === 'day') renderDay(); if (tab === 'msg') renderMsg(); if (tab === 'set') renderSet();
+}
+document.querySelectorAll('nav button').forEach(b => b.onclick = () => { tab = b.dataset.t; window.scrollTo(0, 0); render(); });
+document.getElementById('prev').onclick = () => { cur = addDays(cur, -1); render(); };
+document.getElementById('next').onclick = () => { cur = addDays(cur, 1); render(); };
+document.getElementById('today').onclick = () => { cur = TODAY; render(); };
+document.addEventListener('visibilitychange', () => { if (!document.hidden) render(); });
+load(); render();
+</script>
+</body>
+</html>

@@ -1,0 +1,49 @@
+plugins {
+    id 'com.android.application'
+}
+
+def runNumber = (System.getenv('GITHUB_RUN_NUMBER') ?: '1').toInteger()
+
+android {
+    namespace 'gr.exodouxoi'
+    compileSdk 35
+
+    defaultConfig {
+        applicationId 'gr.exodouxoi'
+        minSdk 24
+        targetSdk 34
+        versionCode runNumber
+        versionName "1.${runNumber}"
+    }
+
+    // Το κλειδί υπογραφής ΔΕΝ είναι στο repo. Στο GitHub Actions έρχεται από τα secrets
+    // KEYSTORE_B64 / KEYSTORE_PASSWORD. Χωρίς αυτά βγαίνει ανυπόγραφο APK.
+    def ksPath = System.getenv('KEYSTORE_PATH')
+    signingConfigs {
+        release {
+            if (ksPath) {
+                storeFile file(ksPath)
+                storePassword System.getenv('KEYSTORE_PASSWORD')
+                keyAlias 'exodouxoi'
+                keyPassword System.getenv('KEYSTORE_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            signingConfig ksPath ? signingConfigs.release : null
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+}
